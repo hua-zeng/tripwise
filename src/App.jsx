@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 
 function App() {
   const [cityInput, setCityInput] = useState('');
+  const [pois, setPois] = useState([]);
   const [location, setLocation] = useState({ lat: '', lon: '' });
   const [error, setError] = useState('');
   const [showMap, setShowMap] = useState(false);
@@ -17,17 +18,44 @@ function App() {
           lon: pos.coords.longitude.toFixed(5),
         };
         setLocation(coords);
+        // Also fetch POIs for current location immediately
+        fetchPOIs(coords.lat, coords.lon);
+        setShowMap(true);
       },
       (err) => {
         console.error(err);
-        setError('❌ Unable to get current location.');
+        setError('Unable to get current location.');
       }
     );
   }, []);
+  useEffect(() => {
+    console.log('POIs:', pois);
+  }, [pois]);
+  const fetchPOIs = async (lat, lon) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/api/places?lat=${lat}&lon=${lon}`
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setPois(data.results || []); // Make sure this matches your API response
+      } else {
+        setError('Failed to fetch POIs.');
+      }
+    } catch (err) {
+      setError('Failed to fetch POIs.');
+    }
+  };
 
   const handleCitySearch = async () => {
     if (cityInput.trim() === '') {
-      setShowMap(true); // fallback to current location
+      // fallback to current location POIs
+      if (location.lat && location.lon) {
+        await fetchPOIs(location.lat, location.lon);
+        setShowMap(true);
+      } else {
+        setError('Please enter a city name or allow location access.');
+      }
       return;
     }
 
@@ -40,15 +68,22 @@ function App() {
       const data = await res.json();
       if (data.length > 0) {
         const { lat, lon } = data[0];
-        setLocation({ lat: parseFloat(lat), lon: parseFloat(lon) });
-        setShowMap(true); // re-render map
+        const parsedLat = parseFloat(lat);
+        const parsedLon = parseFloat(lon);
+        setLocation({ lat: parsedLat, lon: parsedLon });
         setError('');
+        await fetchPOIs(parsedLat, parsedLon);
+        setShowMap(true);
       } else {
-        setError('❌ City not found.');
+        setError('City not found.');
+        setPois([]);
+        setShowMap(false);
       }
     } catch (err) {
       console.error(err);
-      setError('❌ Failed to fetch city coordinates.');
+      setError('Failed to fetch city coordinates.');
+      setPois([]);
+      setShowMap(false);
     }
   };
 
@@ -80,9 +115,11 @@ function App() {
 
       {showMap && location.lat && location.lon && (
         <div className='w-full h-[500px] mt-6'>
+          {/* Pass the POIs here */}
           <MapView
             lat={parseFloat(location.lat)}
             lon={parseFloat(location.lon)}
+            pois={pois}
           />
         </div>
       )}
