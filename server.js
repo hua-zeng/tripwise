@@ -11,24 +11,25 @@ const PORT = 3001;
 app.use(cors());
 
 app.get('/api/places', async (req, res) => {
-  const { lat, lon } = req.query;
+  const { lat, lon, category } = req.query;
   const parsedLat = parseFloat(lat);
   const parsedLon = parseFloat(lon);
-  const serviceKey = process.env.FSQ_SERVICE_KEY; // Rename to SERVICE_KEY for clarity
+  const serviceKey = process.env.FSQ_SERVICE_KEY;
 
   if (!serviceKey) {
     return res.status(500).json({ error: 'Missing Foursquare service key' });
   }
 
+  const categories = category; // default fallback to landmarks/museums
+
   try {
-    console.log(serviceKey);
     const response = await fetch(
-      `https://places-api.foursquare.com/places/search?ll=${lat},${lon}&limit=15&radius=10000&categories=19014,10027,16032&sort=RELEVANCE&open_now=true`,
+      `https://places-api.foursquare.com/places/search?ll=${parsedLat},${parsedLon}&radius=10000&limit=15&fsq_category_ids=${categories}&sort=rating&open_now=true`,
       {
         headers: {
           Accept: 'application/json',
-          Authorization: `Bearer ${serviceKey}`, // Use Bearer token format
-          'X-Places-Api-Version': '2025-06-17', // Add version header
+          Authorization: `Bearer ${serviceKey}`,
+          'X-Places-Api-Version': '2025-06-17',
         },
       }
     );
@@ -39,7 +40,6 @@ app.get('/api/places', async (req, res) => {
     }
 
     const data = await response.json();
-    console.log(data);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch from Foursquare' });

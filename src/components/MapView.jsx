@@ -64,9 +64,17 @@ function MapView({ lat, lon, pois = [] }) {
             <Popup>
               <strong>{poi.name}</strong>
               <br />
-              {poi.location?.address ||
-                poi.location?.formatted_address ||
+              <br />
+              {poi.location?.formatted_address ||
+                poi.location?.address ||
                 'Address not available'}
+              <br />
+              {poi.categories?.[0]?.name && (
+                <>
+                  <em>Category:</em> {poi.categories[0].name}
+                  <br />
+                </>
+              )}
             </Popup>
           </Marker>
         );

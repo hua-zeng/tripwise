@@ -8,6 +8,9 @@ function App() {
   const [location, setLocation] = useState({ lat: '', lon: '' });
   const [error, setError] = useState('');
   const [showMap, setShowMap] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(
+    '4d4b7105d754a06377d81259'
+  );
 
   // Fetch current location on first load
   useEffect(() => {
@@ -28,19 +31,27 @@ function App() {
       }
     );
   }, []);
+
   useEffect(() => {
     console.log('POIs:', pois);
   }, [pois]);
+
+  useEffect(() => {
+    if (location?.lat && location?.lon) {
+      fetchPOIs(location.lat, location.lon);
+    }
+  }, [selectedCategory]);
+
   const fetchPOIs = async (lat, lon) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/api/places?lat=${lat}&lon=${lon}`
+        `http://localhost:3001/api/places?lat=${lat}&lon=${lon}&category=${selectedCategory}`
       );
       const data = await res.json();
       if (res.ok) {
-        setPois(data.results || []); // Make sure this matches your API response
+        setPois(data.results || []);
       } else {
-        setError('Failed to fetch POIs.');
+        setError(data.error || 'Failed to fetch POIs.');
       }
     } catch (err) {
       setError('Failed to fetch POIs.');
@@ -93,6 +104,24 @@ function App() {
         🌍 Tripwise
       </h1>
 
+      {/* Category selector */}
+      <div className='mb-4 w-full max-w-sm space-y-2'>
+        <label className='block text-sm font-medium'>Select Category:</label>
+        <select
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          value={selectedCategory}
+          className='w-full border px-3 py-2 rounded'
+        >
+          <option value='4d4b7105d754a06377d81259,4bf58dd8d48988d181941735,4bf58dd8d48988d163941735'>
+            Landmarks, Museums & Parks
+          </option>
+          <option value='4d4b7105d754a06374d81259,4bf58dd8d48988d1d0941735,63be6904847c3692a84b9bb5'>
+            Food & Drink (Cafes, Dessert, etc)
+          </option>
+        </select>
+      </div>
+
+      {/* City search input */}
       <div className='mb-4 w-full max-w-sm space-y-2'>
         <label className='block text-sm font-medium'>Search City:</label>
         <input
@@ -115,7 +144,6 @@ function App() {
 
       {showMap && location.lat && location.lon && (
         <div className='w-full h-[500px] mt-6'>
-          {/* Pass the POIs here */}
           <MapView
             lat={parseFloat(location.lat)}
             lon={parseFloat(location.lon)}
