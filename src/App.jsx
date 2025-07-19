@@ -9,7 +9,7 @@ function App() {
   const [error, setError] = useState('');
   const [showMap, setShowMap] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(
-    '4d4b7105d754a06377d81259'
+    '4deefb944765f83613cdba6e'
   );
 
   // Fetch current location on first load
@@ -112,12 +112,29 @@ function App() {
           value={selectedCategory}
           className='w-full border px-3 py-2 rounded'
         >
-          <option value='4d4b7105d754a06377d81259,4bf58dd8d48988d181941735,4bf58dd8d48988d163941735'>
-            Landmarks, Museums & Parks
-          </option>
-          <option value='4d4b7105d754a06374d81259,4bf58dd8d48988d1d0941735,63be6904847c3692a84b9bb5'>
-            Food & Drink (Cafes, Dessert, etc)
-          </option>
+          <optgroup label='🏛️ Landmarks & Museums'>
+            <option value='4deefb944765f83613cdba6e'>🗿 Historic Sites</option>
+            <option value='4bf58dd8d48988d181941735'>🖼️ Museums</option>
+            <option value='4bf58dd8d48988d131941735'>⛪ Religious Sites</option>
+          </optgroup>
+
+          <optgroup label='🌳 Nature & Outdoor'>
+            <option value='4bf58dd8d48988d163941735'>🌳 Parks</option>
+            <option value='4bf58dd8d48988d165941735'>⛰️ Scenic Lookouts</option>
+            <option value='4bf58dd8d48988d15a941735'>🌸 Gardens</option>
+          </optgroup>
+
+          <optgroup label='🍽️ Food & Drink'>
+            <option value='4d4b7105d754a06374d81259'>🍴 Restaurants</option>
+            <option value='4bf58dd8d48988d16a941735'>🍰 Bakeries</option>
+            <option value='4bf58dd8d48988d1c9941735'>🍦 Ice Cream</option>
+          </optgroup>
+
+          <optgroup label='☕ Coffee & Beverages'>
+            <option value='4bf58dd8d48988d1e0931735'>☕ Coffee Shops</option>
+            <option value='4bf58dd8d48988d1dc931735'>🍵 Tea Houses</option>
+            <option value='52e81612bcbc57f1066b7a0c'>🍵 Bubble Tea Shop</option>
+          </optgroup>
         </select>
       </div>
 
