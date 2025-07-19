@@ -2,6 +2,17 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { useEffect } from 'react';
 import L from 'leaflet';
 
+const selectedLocationIcon = L.icon({
+  iconUrl:
+    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [0, -41],
+  shadowUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  shadowSize: [41, 41],
+});
+
 function MapUpdater({ lat, lon }) {
   const map = useMap();
 
@@ -26,8 +37,8 @@ function MapView({ lat, lon, pois = [] }) {
       />
 
       {/* User location marker */}
-      <Marker position={[lat, lon]}>
-        <Popup>Your selected location</Popup>
+      <Marker position={[lat, lon]} icon={selectedLocationIcon}>
+        <Popup>Your current location</Popup>
       </Marker>
 
       {/* POI markers */}

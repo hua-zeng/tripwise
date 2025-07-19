@@ -23,7 +23,7 @@ app.get('/api/places', async (req, res) => {
   try {
     console.log(serviceKey);
     const response = await fetch(
-      `https://places-api.foursquare.com/places/search?ll=${parsedLat},${parsedLon}&limit=10`,
+      `https://places-api.foursquare.com/places/search?ll=${lat},${lon}&limit=15&radius=10000&categories=19014,10027,16032&sort=RELEVANCE&open_now=true`,
       {
         headers: {
           Accept: 'application/json',

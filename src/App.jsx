@@ -99,7 +99,7 @@ function App() {
           type='text'
           value={cityInput}
           onChange={(e) => setCityInput(e.target.value)}
-          placeholder='e.g. Tokyo'
+          placeholder='e.g. Seattle'
           className='w-full border px-3 py-2 rounded'
         />
       </div>
