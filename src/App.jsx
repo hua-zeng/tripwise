@@ -2,14 +2,20 @@ import { useEffect, useState } from 'react';
 import MapView from './components/MapView';
 import 'leaflet/dist/leaflet.css';
 
+const apiKeyTomorrow = import.meta.env.VITE_TOMORROW_API_KEY;
+
 function App() {
   const [cityInput, setCityInput] = useState('');
   const [pois, setPois] = useState([]);
   const [location, setLocation] = useState({ lat: '', lon: '' });
+  const [weather, setWeather] = useState(null);
+  const [categorySuggested, setCategorySuggested] = useState(false);
+  const [suggestedCategory, setSuggestedCategory] = useState(null);
+
   const [error, setError] = useState('');
   const [showMap, setShowMap] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(
-    '4deefb944765f83613cdba6e'
+    '4deefb944765f83613cdba6e' // default category
   );
 
   // Fetch current location on first load
@@ -33,14 +39,30 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (location.lat && location.lon) {
+      fetchWeather(location.lat, location.lon);
+    }
+  }, [location]);
+
+  useEffect(() => {
     console.log('POIs:', pois);
   }, [pois]);
 
   useEffect(() => {
-    if (location?.lat && location?.lon) {
+    if (weather && !categorySuggested) {
+      const suggestion = suggestCategoryByWeather(weather);
+      if (suggestion) {
+        setSuggestedCategory(suggestion); // Set the suggested category
+        setCategorySuggested(true); // only do it once
+      }
+    }
+  }, [weather]);
+
+  useEffect(() => {
+    if (categorySuggested && location.lat && location.lon) {
       fetchPOIs(location.lat, location.lon);
     }
-  }, [selectedCategory]);
+  }, [categorySuggested, location.lat, location.lon]);
 
   const fetchPOIs = async (lat, lon) => {
     try {
@@ -55,6 +77,127 @@ function App() {
       }
     } catch (err) {
       setError('Failed to fetch POIs.');
+    }
+  };
+
+  const mapTomorrowWeatherCode = (code) => {
+    const map = {
+      0: 'unknown',
+      1000: 'clear',
+      1100: 'mostly_clear',
+      1101: 'partly_cloudy',
+      1102: 'mostly_cloudy',
+      1001: 'cloudy',
+      2000: 'fog',
+      2100: 'light_fog',
+      4000: 'drizzle',
+      4001: 'rain',
+      4200: 'light_rain',
+      4201: 'heavy_rain',
+      5000: 'snow',
+      5001: 'flurries',
+      5100: 'light_snow',
+      5101: 'heavy_snow',
+      6000: 'freezing_drizzle',
+      6001: 'freezing_rain',
+      6200: 'light_freezing_rain',
+      6201: 'heavy_freezing_rain',
+      7000: 'ice_pellets',
+      7101: 'heavy_ice_pellets',
+      7102: 'light_ice_pellets',
+      8000: 'thunderstorm',
+    };
+    return map[code] || 'unknown';
+  };
+
+  const suggestCategoryByWeather = (condition) => {
+    switch (condition) {
+      case 'clear':
+      case 'mostly_clear':
+      case 'partly_cloudy':
+        return {
+          label: `${condition} weather today, and enjoy Gardens 🌸`,
+          id: '4bf58dd8d48988d15a941735',
+        };
+
+      case 'cloudy':
+      case 'mostly_cloudy':
+        return {
+          label: `${condition} weather today, and have fun at Parks 🌳`,
+          id: '4bf58dd8d48988d163941735',
+        };
+
+      case 'fog':
+      case 'light_fog':
+        return {
+          label: `${condition} weather today, and enjoy Museums 🖼️ `,
+          id: '4bf58dd8d48988d181941735',
+        };
+
+      case 'drizzle':
+      case 'light_rain':
+        return {
+          label: `${condition} weather today, and enjoy Museums 🖼️ `,
+          id: '4bf58dd8d48988d181941735',
+        };
+
+      case 'rain':
+      case 'heavy_rain':
+      case 'freezing_drizzle':
+      case 'freezing_rain':
+      case 'light_freezing_rain':
+      case 'heavy_freezing_rain':
+      case 'thunderstorm':
+        return {
+          label: `${condition} weather today, and enjoy Museums 🖼️ `,
+          id: '4bf58dd8d48988d181941735',
+        };
+
+      case 'snow':
+      case 'flurries':
+      case 'light_snow':
+      case 'heavy_snow':
+        return {
+          label: `${condition} weather today, and go to Restaurants 🍴`,
+          id: '4d4b7105d754a06374d81259',
+        };
+
+      case 'ice_pellets':
+      case 'heavy_ice_pellets':
+      case 'light_ice_pellets':
+        return {
+          label: `${condition} weather today, and have some coffee ☕`,
+          id: '4bf58dd8d48988d1e0931735',
+        };
+
+      default:
+        return {
+          label: `${condition} weather today, and go to Restaurants 🍴`,
+          id: '4d4b7105d754a06374d81259',
+        };
+    }
+  };
+
+  const fetchWeather = async (lat, lon) => {
+    try {
+      const res = await fetch(
+        `https://api.tomorrow.io/v4/weather/realtime?location=${lat},${lon}&apikey=${apiKeyTomorrow}`
+      );
+
+      const data = await res.json();
+      console.log('Tomorrow.io weather response:', data);
+
+      if (data?.data?.values?.weatherCode) {
+        const code = data.data.values.weatherCode;
+        const condition = mapTomorrowWeatherCode(code); // Optional mapping
+        console.log('Mapped condition:', condition);
+        setWeather(condition);
+      } else {
+        setWeather(null);
+      }
+    } catch (err) {
+      console.error('Tomorrow.io weather fetch failed:', err);
+      setWeather(null);
     }
   };
 
@@ -107,6 +250,13 @@ function App() {
       {/* Category selector */}
       <div className='mb-4 w-full max-w-sm space-y-2'>
         <label className='block text-sm font-medium'>Select Category:</label>
+
+        {weather && (
+          <div className='text-sm text-gray-700'>
+            {suggestCategoryByWeather(weather)?.label}
+          </div>
+        )}
+
         <select
           onChange={(e) => setSelectedCategory(e.target.value)}
           value={selectedCategory}
@@ -165,6 +315,7 @@ function App() {
             lat={parseFloat(location.lat)}
             lon={parseFloat(location.lon)}
             pois={pois}
+            weather={weather}
           />
         </div>
       )}

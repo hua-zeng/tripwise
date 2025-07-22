@@ -23,7 +23,7 @@ function MapUpdater({ lat, lon }) {
   return null;
 }
 
-function MapView({ lat, lon, pois = [] }) {
+function MapView({ lat, lon, pois = [], weather }) {
   return (
     <MapContainer
       center={[lat, lon]}
@@ -38,7 +38,16 @@ function MapView({ lat, lon, pois = [] }) {
 
       {/* User location marker */}
       <Marker position={[lat, lon]} icon={selectedLocationIcon}>
-        <Popup>Your current location</Popup>
+        <Popup>
+          <div style={{ marginBottom: '8px' }}>Your current location</div>
+          {weather ? (
+            <div>
+              Weather: <strong>{weather}</strong>
+            </div>
+          ) : (
+            'Loading weather...'
+          )}
+        </Popup>
       </Marker>
 
       {/* POI markers */}
