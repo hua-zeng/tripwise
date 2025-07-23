@@ -9,6 +9,7 @@ function App() {
   const [pois, setPois] = useState([]);
   const [location, setLocation] = useState({ lat: '', lon: '' });
   const [weather, setWeather] = useState(null);
+  const [temperature, setTemperature] = useState(null);
   const [categorySuggested, setCategorySuggested] = useState(false);
   const [suggestedCategory, setSuggestedCategory] = useState(null);
 
@@ -49,14 +50,14 @@ function App() {
   }, [pois]);
 
   useEffect(() => {
-    if (weather && !categorySuggested) {
-      const suggestion = suggestCategoryByWeather(weather);
+    if (weather && temperature && !categorySuggested) {
+      const suggestion = suggestCategoryByWeather(weather, temperature);
       if (suggestion) {
         setSuggestedCategory(suggestion); // Set the suggested category
         setCategorySuggested(true); // only do it once
       }
     }
-  }, [weather]);
+  }, [weather, temperature]);
 
   useEffect(() => {
     if (categorySuggested && location.lat && location.lon) {
@@ -110,7 +111,19 @@ function App() {
     return map[code] || 'unknown';
   };
 
-  const suggestCategoryByWeather = (condition) => {
+  const suggestCategoryByWeather = (condition, temperature) => {
+    const tooHot = temperature > 30;
+    const tooCold = temperature < 5;
+
+    if (tooHot || tooCold) {
+      return {
+        label: `Too ${
+          tooHot ? 'hot' : 'cold'
+        } today (${temperature}°C), stay inside and enjoy Museums 🖼️`,
+        id: '4bf58dd8d48988d181941735',
+      };
+    }
+
     switch (condition) {
       case 'clear':
       case 'mostly_clear':
@@ -189,15 +202,39 @@ function App() {
 
       if (data?.data?.values?.weatherCode) {
         const code = data.data.values.weatherCode;
+        console.log(data.data.values);
         const condition = mapTomorrowWeatherCode(code); // Optional mapping
+        const temperature = data.data.values.temperature;
+
         console.log('Mapped condition:', condition);
+        console.log('Mapped temperature:', temperature);
         setWeather(condition);
+        setTemperature(temperature);
       } else {
         setWeather(null);
       }
     } catch (err) {
       console.error('Tomorrow.io weather fetch failed:', err);
       setWeather(null);
+    }
+  };
+
+  const handleSuggestedClick = async () => {
+    const suggestion = suggestCategoryByWeather(weather, temperature);
+    if (suggestion && location.lat && location.lon) {
+      try {
+        const res = await fetch(
+          `http://localhost:3001/api/places?lat=${location.lat}&lon=${location.lon}&category=${suggestion.id}`
+        );
+        const data = await res.json();
+        if (res.ok) {
+          setPois(data.results || []);
+        } else {
+          setError(data.error || 'Failed to fetch suggested POIs.');
+        }
+      } catch (err) {
+        setError('Failed to fetch suggested POIs.');
+      }
     }
   };
 
@@ -242,75 +279,98 @@ function App() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6 text-gray-800'>
-      <h1 className='font-serif bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text text-6xl font-bold mb-6 leading-tight'>
+    <div className='min-h-screen bg-gray-100 flex flex-col items-center p-2 text-gray-600'>
+      <h1 className='font-serif bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text text-3xl font-bold mb-1 leading-tight text-center'>
         🌍 Tripwise
       </h1>
 
-      {/* Category selector */}
-      <div className='mb-4 w-full max-w-sm space-y-2'>
-        <label className='block text-sm font-medium'>Select Category:</label>
-
+      <div className='w-full max-w-md space-y-1'>
+        {/* Weather Suggestion */}
         {weather && (
-          <div className='text-sm text-gray-700'>
-            {suggestCategoryByWeather(weather)?.label}
+          <div className='text-sm text-gray-700 flex items-center'>
+            <strong>
+              {' '}
+              {suggestCategoryByWeather(weather, temperature)
+                ?.label.split(' ')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')}
+            </strong>
+
+            <button
+              onClick={handleSuggestedClick}
+              className='ml-1 inline-block bg-green-600 text-white px-2 py-0.25 rounded shadow hover:bg-green-700 text-xs'
+            >
+              GO!
+            </button>
           </div>
         )}
 
-        <select
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          value={selectedCategory}
-          className='w-full border px-3 py-2 rounded'
+        {/* Category Selector */}
+        <div>
+          <label className='block text-sm font-medium mb-1'>
+            Select Category:
+          </label>
+          <select
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            value={selectedCategory}
+            className='w-full border px-3 py-0.5 rounded'
+          >
+            <optgroup label='🏛️ Landmarks & Museums'>
+              <option value='4deefb944765f83613cdba6e'>
+                🗿 Historic Sites
+              </option>
+              <option value='4bf58dd8d48988d181941735'>🖼️ Museums</option>
+              <option value='4bf58dd8d48988d131941735'>
+                ⛪ Religious Sites
+              </option>
+            </optgroup>
+            <optgroup label='🌳 Nature & Outdoor'>
+              <option value='4bf58dd8d48988d163941735'>🌳 Parks</option>
+              <option value='4bf58dd8d48988d165941735'>
+                ⛰️ Scenic Lookouts
+              </option>
+              <option value='4bf58dd8d48988d15a941735'>🌸 Gardens</option>
+            </optgroup>
+            <optgroup label='🍽️ Food & Drink'>
+              <option value='4d4b7105d754a06374d81259'>🍴 Restaurants</option>
+              <option value='4bf58dd8d48988d16a941735'>🍰 Bakeries</option>
+              <option value='4bf58dd8d48988d1c9941735'>🍦 Ice Cream</option>
+            </optgroup>
+            <optgroup label='☕ Coffee & Beverages'>
+              <option value='4bf58dd8d48988d1e0931735'>☕ Coffee Shops</option>
+              <option value='4bf58dd8d48988d1dc931735'>🍵 Tea Houses</option>
+              <option value='52e81612bcbc57f1066b7a0c'>
+                🍵 Bubble Tea Shop
+              </option>
+            </optgroup>
+          </select>
+        </div>
+
+        {/* City Search */}
+        <div>
+          <label className='block text-sm font-medium mb-1'>Search City:</label>
+          <input
+            type='text'
+            value={cityInput}
+            onChange={(e) => setCityInput(e.target.value)}
+            placeholder='e.g. Seattle'
+            className='w-full border px-3 py-0.5 rounded'
+          />
+        </div>
+
+        <button
+          onClick={handleCitySearch}
+          className='bg-blue-600 text-white text-sm w-full px-3 py-0.5 rounded shadow hover:bg-blue-700'
         >
-          <optgroup label='🏛️ Landmarks & Museums'>
-            <option value='4deefb944765f83613cdba6e'>🗿 Historic Sites</option>
-            <option value='4bf58dd8d48988d181941735'>🖼️ Museums</option>
-            <option value='4bf58dd8d48988d131941735'>⛪ Religious Sites</option>
-          </optgroup>
+          {'Show Map'}
+        </button>
 
-          <optgroup label='🌳 Nature & Outdoor'>
-            <option value='4bf58dd8d48988d163941735'>🌳 Parks</option>
-            <option value='4bf58dd8d48988d165941735'>⛰️ Scenic Lookouts</option>
-            <option value='4bf58dd8d48988d15a941735'>🌸 Gardens</option>
-          </optgroup>
-
-          <optgroup label='🍽️ Food & Drink'>
-            <option value='4d4b7105d754a06374d81259'>🍴 Restaurants</option>
-            <option value='4bf58dd8d48988d16a941735'>🍰 Bakeries</option>
-            <option value='4bf58dd8d48988d1c9941735'>🍦 Ice Cream</option>
-          </optgroup>
-
-          <optgroup label='☕ Coffee & Beverages'>
-            <option value='4bf58dd8d48988d1e0931735'>☕ Coffee Shops</option>
-            <option value='4bf58dd8d48988d1dc931735'>🍵 Tea Houses</option>
-            <option value='52e81612bcbc57f1066b7a0c'>🍵 Bubble Tea Shop</option>
-          </optgroup>
-        </select>
+        {error && <p className='text-red-600'>{error}</p>}
       </div>
 
-      {/* City search input */}
-      <div className='mb-4 w-full max-w-sm space-y-2'>
-        <label className='block text-sm font-medium'>Search City:</label>
-        <input
-          type='text'
-          value={cityInput}
-          onChange={(e) => setCityInput(e.target.value)}
-          placeholder='e.g. Seattle'
-          className='w-full border px-3 py-2 rounded'
-        />
-      </div>
-
-      <button
-        onClick={handleCitySearch}
-        className='bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700'
-      >
-        {showMap ? 'Update Map' : 'Show Map'}
-      </button>
-
-      {error && <p className='mt-4 text-red-600'>{error}</p>}
-
+      {/* Map Section */}
       {showMap && location.lat && location.lon && (
-        <div className='w-full h-[500px] mt-6'>
+        <div className='w-full mt-2 h-[500px]'>
           <MapView
             lat={parseFloat(location.lat)}
             lon={parseFloat(location.lon)}
