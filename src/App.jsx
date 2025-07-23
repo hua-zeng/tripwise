@@ -129,28 +129,28 @@ function App() {
       case 'mostly_clear':
       case 'partly_cloudy':
         return {
-          label: `${condition} weather today, and enjoy Gardens 🌸`,
+          label: `${condition} weather today (${temperature}°C), and enjoy Gardens 🌸`,
           id: '4bf58dd8d48988d15a941735',
         };
 
       case 'cloudy':
       case 'mostly_cloudy':
         return {
-          label: `${condition} weather today, and have fun at Parks 🌳`,
+          label: `${condition} weather today (${temperature}°C), and have fun at Parks 🌳`,
           id: '4bf58dd8d48988d163941735',
         };
 
       case 'fog':
       case 'light_fog':
         return {
-          label: `${condition} weather today, and enjoy Museums 🖼️ `,
+          label: `${condition} weather today (${temperature}°C), and enjoy Museums 🖼️ `,
           id: '4bf58dd8d48988d181941735',
         };
 
       case 'drizzle':
       case 'light_rain':
         return {
-          label: `${condition} weather today, and enjoy Museums 🖼️ `,
+          label: `${condition} weather today (${temperature}°C), and enjoy Museums 🖼️ `,
           id: '4bf58dd8d48988d181941735',
         };
 
@@ -162,7 +162,7 @@ function App() {
       case 'heavy_freezing_rain':
       case 'thunderstorm':
         return {
-          label: `${condition} weather today, and enjoy Museums 🖼️ `,
+          label: `${condition} weather today (${temperature}°C), and enjoy Museums 🖼️ `,
           id: '4bf58dd8d48988d181941735',
         };
 
@@ -171,7 +171,7 @@ function App() {
       case 'light_snow':
       case 'heavy_snow':
         return {
-          label: `${condition} weather today, and go to Restaurants 🍴`,
+          label: `${condition} weather today (${temperature}°C), and go to Restaurants 🍴`,
           id: '4d4b7105d754a06374d81259',
         };
 
@@ -179,13 +179,13 @@ function App() {
       case 'heavy_ice_pellets':
       case 'light_ice_pellets':
         return {
-          label: `${condition} weather today, and have some coffee ☕`,
+          label: `${condition} weather today (${temperature}°C), and have some coffee ☕`,
           id: '4bf58dd8d48988d1e0931735',
         };
 
       default:
         return {
-          label: `${condition} weather today, and go to Restaurants 🍴`,
+          label: `${condition} weather today (${temperature}°C), and go to Restaurants 🍴`,
           id: '4d4b7105d754a06374d81259',
         };
     }
@@ -284,7 +284,7 @@ function App() {
         🌍 Tripwise
       </h1>
 
-      <div className='w-full max-w-md space-y-1'>
+      <div className='w-full max-w-xl space-y-1'>
         {/* Weather Suggestion */}
         {weather && (
           <div className='text-sm text-gray-700 flex items-center'>
@@ -298,7 +298,7 @@ function App() {
 
             <button
               onClick={handleSuggestedClick}
-              className='ml-1 inline-block bg-green-600 text-white px-2 py-0.25 rounded shadow hover:bg-green-700 text-xs'
+              className='ml-1 inline-block bg-purple-500 text-white px-2 py-0.25 rounded shadow hover:bg-purple-300 text-xs'
             >
               GO!
             </button>
@@ -360,7 +360,7 @@ function App() {
 
         <button
           onClick={handleCitySearch}
-          className='bg-blue-600 text-white text-sm w-full px-3 py-0.5 rounded shadow hover:bg-blue-700'
+          className='bg-blue-500 text-white text-sm w-full px-3 py-0.5 rounded shadow hover:bg-blue-300'
         >
           {'Show Map'}
         </button>
@@ -376,6 +376,7 @@ function App() {
             lon={parseFloat(location.lon)}
             pois={pois}
             weather={weather}
+            temperature={temperature}
           />
         </div>
       )}
