@@ -23,7 +23,8 @@ function MapUpdater({ lat, lon }) {
   return null;
 }
 
-function MapView({ lat, lon, pois = [], weather }) {
+function MapView({ lat, lon, pois = [], weather, temperature }) {
+  console.log('weather:', weather, 'temperature:', temperature);
   return (
     <MapContainer
       center={[lat, lon]}
@@ -41,9 +42,15 @@ function MapView({ lat, lon, pois = [], weather }) {
         <Popup>
           <div style={{ marginBottom: '8px' }}>Your current location</div>
           {weather ? (
-            <div>
-              Weather: <strong>{weather}</strong>
-            </div>
+            <>
+              {' '}
+              <div>
+                Weather: <strong>{weather}</strong>
+              </div>
+              <div>
+                Temperature: <strong>{temperature}</strong>
+              </div>
+            </>
           ) : (
             'Loading weather...'
           )}

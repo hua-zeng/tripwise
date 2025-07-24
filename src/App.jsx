@@ -212,10 +212,12 @@ function App() {
         setTemperature(temperature);
       } else {
         setWeather(null);
+        setTemperature(null);
       }
     } catch (err) {
       console.error('Tomorrow.io weather fetch failed:', err);
       setWeather(null);
+      setTemperature(null);
     }
   };
 
