@@ -112,14 +112,15 @@ function App() {
   };
 
   const suggestCategoryByWeather = (condition, temperature) => {
-    const tooHot = temperature > 30;
+    const tooHot = temperature > 34;
     const tooCold = temperature < 5;
 
+    const temperatureF = (temperature * 1.8 + 32).toFixed(1);
     if (tooHot || tooCold) {
       return {
         label: `Too ${
           tooHot ? 'hot' : 'cold'
-        } today (${temperature}°C), stay inside and enjoy Museums 🖼️`,
+        } today (${temperatureF}°F), stay inside and enjoy Museums 🖼️`,
         id: '4bf58dd8d48988d181941735',
       };
     }
@@ -129,28 +130,28 @@ function App() {
       case 'mostly_clear':
       case 'partly_cloudy':
         return {
-          label: `${condition} weather today (${temperature}°C), and enjoy Gardens 🌸`,
+          label: `${condition} weather today (${temperatureF}°F), and enjoy Gardens 🌸`,
           id: '4bf58dd8d48988d15a941735',
         };
 
       case 'cloudy':
       case 'mostly_cloudy':
         return {
-          label: `${condition} weather today (${temperature}°C), and have fun at Parks 🌳`,
+          label: `${condition} weather today (${temperatureF}°F), and have fun at Parks 🌳`,
           id: '4bf58dd8d48988d163941735',
         };
 
       case 'fog':
       case 'light_fog':
         return {
-          label: `${condition} weather today (${temperature}°C), and enjoy Museums 🖼️ `,
+          label: `${condition} weather today (${temperatureF}°F), and enjoy Museums 🖼️ `,
           id: '4bf58dd8d48988d181941735',
         };
 
       case 'drizzle':
       case 'light_rain':
         return {
-          label: `${condition} weather today (${temperature}°C), and enjoy Museums 🖼️ `,
+          label: `${condition} weather today (${temperatureF}°F), and enjoy Museums 🖼️ `,
           id: '4bf58dd8d48988d181941735',
         };
 
@@ -162,7 +163,7 @@ function App() {
       case 'heavy_freezing_rain':
       case 'thunderstorm':
         return {
-          label: `${condition} weather today (${temperature}°C), and enjoy Museums 🖼️ `,
+          label: `${condition} weather today (${temperatureF}°F), and enjoy Museums 🖼️ `,
           id: '4bf58dd8d48988d181941735',
         };
 
@@ -171,7 +172,7 @@ function App() {
       case 'light_snow':
       case 'heavy_snow':
         return {
-          label: `${condition} weather today (${temperature}°C), and go to Restaurants 🍴`,
+          label: `${condition} weather today (${temperatureF}°F), and go to Restaurants 🍴`,
           id: '4d4b7105d754a06374d81259',
         };
 
@@ -179,13 +180,13 @@ function App() {
       case 'heavy_ice_pellets':
       case 'light_ice_pellets':
         return {
-          label: `${condition} weather today (${temperature}°C), and have some coffee ☕`,
+          label: `${condition} weather today (${temperatureF}°F), and have some coffee ☕`,
           id: '4bf58dd8d48988d1e0931735',
         };
 
       default:
         return {
-          label: `${condition} weather today (${temperature}°C), and go to Restaurants 🍴`,
+          label: `${condition} weather today (${temperatureF}°F), and go to Restaurants 🍴`,
           id: '4d4b7105d754a06374d81259',
         };
     }
@@ -300,7 +301,7 @@ function App() {
 
             <button
               onClick={handleSuggestedClick}
-              className='ml-1 inline-block bg-purple-500 text-white px-2 py-0.25 rounded shadow hover:bg-purple-300 text-xs'
+              className='ml-1 inline-block bg-purple-500 text-white px-3 py-0.5 rounded shadow hover:bg-purple-300 text-xs'
             >
               GO!
             </button>

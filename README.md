@@ -1,12 +1,77 @@
-# React + Vite
+# 🌍 Tripwise
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Tripwise** is a smart travel companion that recommends nearby places to visit based on real-time weather and your current or searched location. Whether you're in the mood for a sunny park stroll or need a rainy-day museum retreat, Tripwise helps you make the right choice—instantly and interactively.
 
-Currently, two official plugins are available:
+<!-- Optional: add a screenshot here -->
+<!-- ![Tripwise Screenshot](client/screenshot.png) -->
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🚀 Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 🔍 Search any city or use your current location
+- ☁️ Real-time weather data from [Tomorrow.io](https://www.tomorrow.io/)
+- 📍 Smart suggestions based on temperature & weather conditions
+- 🗺️ Interactive map using Leaflet with Points of Interest from Foursquare
+- 🎯 Category selector for personalized exploration (e.g., parks, museums, cafes)
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend:**
+
+- React (Vite)
+- Tailwind CSS
+- Leaflet.js
+
+**Backend:**
+
+- Node.js
+- Express (as a simple proxy server)
+
+**APIs Used:**
+
+- [Tomorrow.io](https://www.tomorrow.io/) — for real-time weather
+- [Foursquare Places API](https://developer.foursquare.com/docs/) — for POI search
+- [OpenStreetMap Nominatim](https://nominatim.org/) — for city geocoding
+
+---
+
+## 📦 Installation
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/hua-zeng/tripwise.git
+cd tripwise
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Create .env files
+
+```
+VITE_TOMORROW_API_KEY=your_tomorrow_api_key_here
+FSQ_SERVICE_KEY=your_foursquare_api_key_here
+```
+
+### 4. Run the project
+
+Start the backend
+
+```bash
+npm run server
+```
+
+Start the frontend
+
+```bash
+npm run dev
+```
+
+Open the app at: http://localhost:5173

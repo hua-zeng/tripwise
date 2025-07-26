@@ -25,6 +25,9 @@ function MapUpdater({ lat, lon }) {
 
 function MapView({ lat, lon, pois = [], weather, temperature }) {
   console.log('weather:', weather, 'temperature:', temperature);
+
+  const temperatureF = (temperature * 1.8 + 32).toFixed(1);
+
   return (
     <MapContainer
       center={[lat, lon]}
@@ -48,7 +51,7 @@ function MapView({ lat, lon, pois = [], weather, temperature }) {
                 Weather: <strong>{weather}</strong>
               </div>
               <div>
-                Temperature: <strong>{temperature}</strong>
+                Temperature: <strong>${temperatureF}°F</strong>
               </div>
             </>
           ) : (
